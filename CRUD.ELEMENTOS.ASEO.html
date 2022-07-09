@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>CRUD ELEMENTOS DE ASEO</title>
+  <style>
+    input[type='submit'], button, [aria-label]{
+      cursor: pointer;
+    }
+    #spoiler{
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+<form action="javascript:void(0);" method="POST" onsubmit="app.Add()">
+<!--
+//app.Add(): Agreción de una aplicación no especificada.
+//javascript:void(0): El operador void de JavaScript evalúa una expresión y devuelve "undefined" sin importar el valor que en este esté ; en este caso es "0"(valor recomendado).
+//*El operador void es útil cuando quieres evitar cualquier actualización o redirecciones de página no deseadas. En vez de eso, ejecuta alguna operación de JavaScript.*
+-->
+  <input type="text" id="add-name" placeholder="Nuevo elemento de aseo">
+  <input type="submit" value="Agregar">
+</form>
+
+<div id="spoiler" role="aria-hidden">
+  <form action="javascript:void(0);" method="POST" id="saveEdit">
+    <input type="text" id="edit-name">
+    <input type="submit" value="Editar" /> <a onclick="CloseInput()" aria-label="Close">&#10006;</a>
+  </form>
+</div>
+
+<p id="mostrador"></p>
+
+<table>
+  <tr>
+    <th>Elementos de aseo</th>
+  </tr>
+    <tbody id="Elementos">
+    </tbody>
+</table>
+
+<script>
+var app = new function() {
+  this.el = document.getElementById('Elementos');
+  this.Elementos = ['Jabón', 'Champú', 'Desodorante', 'Pasta dental', 'Papel higiénico', 'Cepillo de dientes', 'Toalla', 'Escoba', 'Detergente'];
+  this.Count = function(data) {
+    var el   = document.getElementById('mostrador');
+    var name = 'Elemento';
+    if (data) {
+      if (data > 1) {
+        name = 'Son el total de Elementos.A actuales';
+      }
+      el.innerHTML = data + ' ' + name ;
+    } else {
+      el.innerHTML = 'No ' + name;
+    }
+  };
+  
+  this.FetchAll = function() {
+    // Fetch (un API) es básicamente la nueva interfaz para realizar funcionalidades Ajax con Javascript, que ya podemos usar para facilitar la organización del código en nuestras aplicaciones.
+    var data = '';
+    if (this.Elementos.length > 0) {
+      for (i = 0; i < this.Elementos.length; i++) {
+        data += '<tr>';
+        data += '<td>' + this.Elementos[i] + '</td>';
+        data += '<td><button onclick="app.Edit(' + i + ')">Editar</button></td>';
+        data += '<td><button onclick="app.Delete(' + i + ')">Eliminar</button></td>';
+        data += '</tr>';
+      }
+    }
+    this.Count(this.Elementos.length);
+    return this.el.innerHTML = data;
+  };
+  this.Add = function () {
+    el = document.getElementById('add-name');
+    // Get the value
+    var Elemento = el.value;
+    if (Elemento) {
+      // Add the new value
+      this.Elementos.push(Elemento.trim());
+      // Reset input value
+      el.value = '';
+      // Dislay the new list
+      this.FetchAll();
+    }
+  };
+  this.Edit = function (item) {
+    var el = document.getElementById('edit-name');
+    // Display value in the field
+    el.value = this.Elementos[item];
+    // Display fields
+    document.getElementById('spoiler').style.display = 'block';
+    self = this;
+    document.getElementById('saveEdit').onsubmit = function() {
+      // Get value
+      var Elemento = el.value;
+      if (Elemento) {
+        // Edit value
+        self.Elementos.splice(item, 1, Elemento.trim());
+        // Display the new list
+        self.FetchAll();
+        // Hide fields
+        CloseInput();
+      }
+    }
+  };
+  this.Delete = function (item) {
+    // Delete the current row
+    this.Elementos.splice(item, 1);
+    // Display the new list
+    this.FetchAll();
+  };
+  
+}
+app.FetchAll();
+function CloseInput() {
+  document.getElementById('spoiler').style.display = 'none';
+}
+</script>
+</body>
+</html>
